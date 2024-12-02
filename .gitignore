@@ -1,0 +1,12 @@
+src/inputs/
+
+.cljfmt.clj
+deps.edn
+
+.nrepl-port
+
+.calva/
+.clj-kondo/
+.cpcache/
+.lsp/
+.vscode/
