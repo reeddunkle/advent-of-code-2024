@@ -41,10 +41,10 @@
 (defn solve2 [lists]
   (let [listA (first lists)
         listB (second lists)
-        idByFreqB (frequencies listB)]
+        idToFreqB (frequencies listB)]
     (->> listA
          (map (fn [id]
-                (let [frequencyInB (get idByFreqB id 0)]
+                (let [frequencyInB (get idToFreqB id 0)]
                   (* id frequencyInB))))
          (reduce +))))
 
