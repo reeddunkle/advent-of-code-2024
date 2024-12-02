@@ -2,6 +2,8 @@
   (:require
    [clojure.string :as str]))
 
+;; Util
+
 (defn abs-diff [a b]
   (Math/abs (- a b)))
 
@@ -16,6 +18,13 @@
 
 (defn descending? [list]
   (pairwise-compare list >))
+
+(defn omit-by-index [omitted-index collection]
+  (keep-indexed (fn [index value]
+                  (when (not= index omitted-index) value))
+                collection))
+
+;; Input
 
 (def sampleInput "7 6 4 2 1
 1 2 7 8 9
@@ -32,6 +41,8 @@
        (map #(str/split % #" "))
        (map (fn [list] (map #(Integer/parseInt %) list)))))
 
+;; Puzzle
+
 (defn passes-rule-1 [report]
   (some #(% report) [ascending? descending?]))
 
@@ -47,15 +58,10 @@
 
 (defn is-report-tolerable [report]
   (or (is-report-safe report)
-      (reduce
-       (fn [is-tolerable omitted-index]
-         (or is-tolerable
-             (is-report-safe
-              (keep-indexed (fn [index value]
-                              (when (not= index omitted-index) value))
-                            report))))
-       false
-       (range (count report)))))
+      (some (fn [omitted-index]
+              (is-report-safe
+               (omit-by-index omitted-index report)))
+            (range (count report)))))
 
 (defn solve1 [reports]
   (->> reports (filter is-report-safe) (count)))
