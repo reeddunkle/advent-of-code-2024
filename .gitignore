@@ -1,5 +1,3 @@
-src/inputs/
-
 .cljfmt.clj
 deps.edn
 
