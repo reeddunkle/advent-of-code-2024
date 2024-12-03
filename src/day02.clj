@@ -7,17 +7,17 @@
 (defn abs-diff [a b]
   (Math/abs (- a b)))
 
-(defn pairwise-compare [list predicate]
+(defn pairwise-compare [predicate list]
   (or (empty? list)
       (empty? (rest list))
       (and (predicate (first list) (second list))
-           (pairwise-compare (rest list) predicate))))
+           (pairwise-compare predicate (rest list)))))
 
 (defn ascending? [list]
-  (pairwise-compare list <))
+  (pairwise-compare < list))
 
 (defn descending? [list]
-  (pairwise-compare list >))
+  (pairwise-compare > list))
 
 (defn omit-by-index [omitted-index collection]
   (keep-indexed (fn [index value]
@@ -51,7 +51,7 @@
     (and (>= diff min) (<= diff max))))
 
 (defn passes-rule-2 [report]
-  (pairwise-compare report safe-diff?))
+  (pairwise-compare safe-diff? report))
 
 (defn is-report-safe [report]
   ((every-pred passes-rule-1 passes-rule-2) report))
