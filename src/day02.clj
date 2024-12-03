@@ -44,7 +44,7 @@
 ;; Puzzle
 
 (defn passes-rule-1 [report]
-  (some #(% report) [ascending? descending?]))
+  ((some-fn ascending? descending?) report))
 
 (defn safe-diff? [a b]
   (let [min 1 max 3 diff (abs-diff a b)]
@@ -54,7 +54,7 @@
   (pairwise-compare report safe-diff?))
 
 (defn is-report-safe [report]
-  (every? #(% report) [passes-rule-1 passes-rule-2]))
+  ((every-pred passes-rule-1 passes-rule-2) report))
 
 (defn is-report-tolerable [report]
   (or (is-report-safe report)
@@ -70,11 +70,11 @@
   (->> reports (filter is-report-tolerable) (count)))
 
 (def sampleReports (parse sampleInput))
-(def data (parse input))
+(def reports (parse input))
 
 (solve1 sampleReports)
-(solve1 data)
+(solve1 reports)
 
 (solve2 sampleReports)
-(solve2 data)
+(solve2 reports)
 
