@@ -1,50 +1,45 @@
 (ns day04 (:require
            [clojure.string :as str]))
 
-(def sampleInput1 (slurp "src/inputs/day04-p1"))
-(def sampleInput2 (slurp "src/inputs/day04-p2"))
-(def input (slurp "src/inputs/day04"))
+(defn within-bounds? [y x max-y max-x]
+  (and (>= y 0) (< y max-y) (>= x 0) (< x max-x)))
 
-;; Notes
-;; Horizontal = letters spaced by 1
-;; Diagonal diagonal-up-right = letters spaced by length - 1
-;; Vertical = letters spaced by line length
-;; Diagonal diagonal-down-right = letters spaced by length + 1
+(defn get-coords [lines coords]
+  (map (fn [[y x]] (get-in lines [y x])) coords))
 
 (defn is-match [chars]
-  (let [joined (str/join "" chars)] (or (= joined "XMAS") (= joined "SAMX"))))
+  (some #(= "XMAS" %)
+        [(str/join "" chars)
+         (str/join "" (reverse chars))]))
 
 (defn solve1 [data]
-  (let [lines (str/split-lines data)
-        lineLength (count (first lines))
-        steps [1 (- lineLength 1) lineLength (+ lineLength 1)]
-        chars (vec (apply str lines))
-        total-chars (count chars)
-        final-index (- total-chars 4)]
+  (let [lines (mapv vec (str/split-lines data))
+        max-y (count lines)
+        max-x (count (first lines))
+        steps [[[0 1] [0 2] [0 3]] ;; Horizontal
+               [[1 -1] [2 -2] [3 -3]] ;; Diagonal left
+               [[1 0] [2 0] [3 0]] ;; Vertical
+               [[1 1] [2 2] [3 3]]] ;; Diagonal right
+        ]
     (reduce
-     (fn [total-count idx1]
-       (let [inner-count
-             (reduce
-              (fn [_inner-count step]
-                (let [idx2 (+ step idx1)
-                      idx3 (+ step idx2)
-                      idx4 (+ step idx3)]
-                  (cond
-                    ;; Skip if indices are out of bounds
-                    (>= idx4 total-chars) _inner-count
-
-                    (is-match [(nth chars idx1)
-                               (nth chars idx2)
-                               (nth chars idx3)
-                               (nth chars idx4)])
-                    (inc _inner-count)
-
-                    :else _inner-count)))
-              0
-              steps)]
-         (+ total-count inner-count)))
+     (fn [total y1]
+       (reduce
+        (fn [count x1]
+          (reduce
+           (fn [inner-count step]
+             (let [coords (map #(vector (+ y1 (first %)) (+ x1 (second %))) step)
+                   [last-y last-x] (last coords)
+                   valid? (within-bounds? last-y last-x max-y max-x)]
+               (if
+                (and valid? (is-match (get-coords lines (cons [y1 x1] coords))))
+                 (inc inner-count)
+                 inner-count)))
+           count
+           steps))
+        total
+        (range max-x)))
      0
-     (range final-index))))
+     (range max-y))))
 
 (solve1 (slurp "src/inputs/day04"))
 
